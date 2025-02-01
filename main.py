@@ -22,6 +22,11 @@ class CQM:
         self.make_height_line(rooms_per_floor)
         print(self.height_line)
         self.cqm = ConstrainedQuadraticModel()
+        self.cqm.add_variable("REAL", "b")
+        methods = [method for method in dir(self.cqm.variables) if callable(
+            getattr(self.cqm.variables, method))]
+        print(list(self.cqm.variables))
+        # print(dir(self.cqm.variables))
         # self.cqm.set_objective()
         self.yj = []
         self.month = 0
