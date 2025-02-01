@@ -9,3 +9,6 @@ example:
 
 example-requirements: 
 	cd job-shop-scheduling-cqm && pip install -r requirements.txt
+
+run: 
+	python main.py
