@@ -7,8 +7,17 @@ cqm = dimod.ConstrainedQuadraticModel()
 
 # Define integer variables x0 to x18
 num_vars = 19
+yj = []
+for i in range(num_vars):
+    yj.append(i)
+yj_sum = dimod.Integer(sum(yj))
+yj_sum_squared = dimod.Integer(sum([x * x for x in yj]))
+print(yj)
 variables = [dimod.Integer(f'x{i}') for i in range(num_vars)]
-print(variables)
+# for i, var in q enumerate(variables):
+# print(var.get_linear(f'x{i}'))
+
+# print(variables)
 
 D_matrix = np.array([
     [0, 12, 36, 28, 52, 44, 110, 126, 94, 63, 130,
@@ -81,36 +90,59 @@ F_matrix = np.array([
 
 
 def F(i, j):
-    return F_matrix[i, j]  # Replace with real values if known
+    return F_matrix[i][j]  # Replace with real values if known
 
 # Define D(x[i], x[j]) function (example: absolute difference)
 
 
 def D(xi, xj):
     # Can be changed to (xi - xj)**2 for squared penalty
-    return D_matrix[xi, xj]
+    return D_matrix[int(xi)][int(xj)]
 
 
+# [i].get_linear(f'x{i}')
+# [j].get_linear(f'x{j}')
 # Define the objective function
-objective = sum(F(i, j) * D(variables[i], variables[j])
-                for i in range(num_vars) for j in range(num_vars))
+sum = 0
+variables = list(variables)
+
+for i in range(num_vars):
+    for j in range(num_vars):
+        sum += F(i, j) * \
+            D(variables[i].get_linear(f'x{i}'),
+              variables[j].get_linear(f'x{j}'))
+objective = dimod.Integer(sum)
+# objective = sum(F(i, j) * D(variables[i], variables[j])
+#                 for i in range(num_vars) for j in range(num_vars))
 
 
+# cqm.add_constraint(
+#     yj_sum + yj_sum_squared == 1938,
+#     label="The"
+# )
+cqm.add_constraint(
+    yj_sum == 171, label="the"
+)
+cqm.add_constraint(
+    yj_sum_squared == 2109, label="th2e"
+)
 # Set the objective to be minimized
 cqm.set_objective(objective)
 
 
-# Create the sampler
-sampler = LeapHybridCQMSampler()
+# # Create the sampler
+# sampler = LeapHybridCQMSampler()
 
-# Solve the CQM model
-# Adjust time_limit as needed
-sampleset = sampler.sample_cqm(cqm, time_limit=10)
+# # Solve the CQM model
+# # Adjust time_limit as needed
+# sampleset = sampler.sample_cqm(cqm, time_limit=10)
 
-# Get the best solution
-feasible_solutions = sampleset.filter(lambda d: d.is_feasible)
-if feasible_solutions:
-    best_solution = feasible_solutions.first.sample
-    print("Best Feasible Solution:", best_solution)
-else:
-    print("No feasible solution found. Try increasing time limit or adjusting constraints.")
+# # Get the best solution
+# feasible_solutions = sampleset.filter(lambda d: d.is_feasible)
+# if feasible_solutions:
+#     print(len(feasible_solutions.record))
+#     print(feasible_solutions)
+#     best_solution = feasible_solutions.first.sample
+#     print("Best Feasible Solution:", best_solution)
+# else:
+#     print("No feasible solution found. Try increasing time limit or adjusting constraints.")

@@ -17,19 +17,20 @@ def string_to_matrix(string):
 
 
 class CQM:
-    def __init__(self, rooms_per_floor):
+    def __init__(self, rooms_per_floor, elem_count, d_matrix, flow_matrix):
         self.height_line = []
         self.make_height_line(rooms_per_floor)
         print(self.height_line)
         self.cqm = ConstrainedQuadraticModel()
-        self.cqm.add_variable("REAL", "b")
-        methods = [method for method in dir(self.cqm.variables) if callable(
-            getattr(self.cqm.variables, method))]
-        print(list(self.cqm.variables))
         # print(dir(self.cqm.variables))
         # self.cqm.set_objective()
         self.yj = []
         self.month = 0
+        self.max_val = 100
+        self.dmn = d_matrix
+        self.flow = flow_matrix
+        self.bits = np.random.randint(
+            0, 1, size=(elem_count, elem_count))
         # N = 19
 
         # self.cqm.add_constraint(
@@ -40,12 +41,12 @@ class CQM:
         self.alpha = 1
         self.beta = 1
         self.gamma = 1
-        self.c = 0
-        for j in range(len(self.yj)):
-            for k in range(len(self.yj)):
+        self.cost = []
+        for j in range(elem_count):
+            for k in range(elem_count):
                 # difference in floors
-                dist = self.yj
-                print(j, k)
+                # dist = self.yj
+                # print(j, k)
                 # self.c += self.f[j, k] * self.d[y[j], y[k]] + self.alpha * self.d[y[j], y[k]] \
                 #     + self.beta * self.f[j, k] * \
                 #     self.f[j, k] + self.gamma * self.h()
@@ -90,5 +91,5 @@ class CQM:
 
 # def build_cqm():
 if __name__ == "__main__":
-    cqm = CQM([2, 2, 2])
+    cqm = CQM([2, 2, 2], 25, resources.D_matrix, resources.F_matrix)
     first, last = cqm.get_txt_matrix("hospital_data_set.txt")
